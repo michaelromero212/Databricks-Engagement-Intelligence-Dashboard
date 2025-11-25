@@ -1,0 +1,12 @@
+pandas
+numpy
+python-dotenv
+textblob
+transformers
+scikit-learn
+streamlit
+requests
+databricks-sdk
+matplotlib
+seaborn
+plotly
