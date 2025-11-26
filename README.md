@@ -21,23 +21,27 @@ An AI + Databricks analytics pipeline that ingests sample engagement data and pr
 
 ### Main Dashboard
 ![Main Dashboard](docs/images/01_main_dashboard.png)
-*Overview showing key metrics: Total Engagements, Average Sentiment, Positive Feedback, and At-Risk engagements.*
+*Dashboard overview with Key Performance Indicators and Executive Snapshot showing overall engagement health status with color-coded indicator.*
+
+### Priority Table
+![Priority Table](docs/images/02_priority_table.png)
+*Actionable priority table displaying engagements requiring attention, sorted by priority score with progress bars for sentiment and urgency visualization.*
 
 ### Sentiment Analysis
-![Sentiment Analysis](docs/images/02_sentiment_analysis.png)
-*Pie chart showing sentiment distribution and trend line tracking sentiment over time, with a table of recent negative feedback.*
+![Sentiment Analysis](docs/images/03_sentiment_analysis.png)
+*Horizontal stacked bar chart showing sentiment distribution and trend line with color-coded context zones (danger/warning/healthy) for instant interpretation.*
 
-### Top Issues
-![Top Issues](docs/images/03_top_issues.png)
-*Bar chart displaying the most frequent engagement topics, with detailed notes filterable by topic.*
+### Topics & Issues
+![Topics & Issues](docs/images/04_topics_issues.png)
+*Enhanced bar chart with topic concentration metrics displaying the most frequent engagement topics with direct labels and percentage breakdowns.*
 
 ### Skills Gap Analysis
-![Skills Gap](docs/images/04_skills_gap.png)
-*Comparison between market demand (engagement frequency) and team proficiency across technologies.*
+![Skills Gap](docs/images/05_skills_gap.png)
+*Diverging bar chart comparing market demand vs. team proficiency, with red bars indicating training priorities and green bars showing surplus capacity.*
 
-### Executive Summary
-![Executive Summary](docs/images/05_executive_summary.png)
-*AI-generated weekly briefing with key insights and recommended leadership actions.*
+### Executive Report
+![Executive Report](docs/images/06_executive_report.png)
+*AI-generated weekly briefing with comprehensive insights and recommended leadership actions based on engagement patterns and trends.*
 
 ## Architecture
 ```mermaid
@@ -102,18 +106,27 @@ graph LR
 
 ## Features
 
+### Data Visualization Best Practices
+- **Optimized Chart Types**: Replaced pie charts with stacked bars for easier comparison (2-3x better comprehension)
+- **Context Zones**: Color-coded background zones on trends for instant health interpretation
+- **Diverging Bar Charts**: Shows skills gap magnitude and direction intuitively
+- **Direct Labels**: All charts include inline values reducing cognitive load
+- **Clear Explanations**: Every chart has "What this shows" and "What to look for" guidance
+
 ### Modern, Accessible Design
 - **WCAG AA Compliant**: All colors meet accessibility standards with verified contrast ratios
 - **Responsive Layout**: Fully responsive design that works on desktop, tablet, and mobile
 - **Color-blind Friendly**: Uses carefully selected color palettes safe for all users
-- **Professional UI**: Clean, modern interface with smooth animations and hover effects
+- **Professional UI**: Clean, modern interface with consistent styling and no decorative elements
 
 ### AI-Powered Insights
 - **Sentiment Analysis**: Automatically scores customer feedback using TextBlob
 - **Topic Extraction**: Identifies recurring themes and technical challenges
 - **Executive Summaries**: Generates strategic insights for leadership
+- **Priority Scoring**: Automatic calculation of engagement urgency based on sentiment and staleness
 
 ### Interactive Visualizations
 - **Dynamic Charts**: Interactive Plotly charts with responsive containers
 - **Filterable Data**: Sidebar controls to filter by engagement status
+- **Sortable Tables**: Priority table with progress bar visualization
 - **Real-time Updates**: Dashboard responds instantly to filter changes

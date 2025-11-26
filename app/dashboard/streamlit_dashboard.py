@@ -811,41 +811,174 @@ def main():
         
         st.markdown("")
 
-    # Executive Summary Highlights
+    # ============================================================================
+    # EXECUTIVE SNAPSHOT - Critical Information First
+    # ============================================================================
+    # Design rationale: Decision-makers need to see health status and priorities
+    # immediately without scrolling or clicking tabs. This section answers:
+    # "What needs my attention RIGHT NOW?"
+    
+    st.markdown("## Executive Snapshot")
     st.markdown("""
-    <div class="insight-card">
-        <h3>Executive Summary Highlights</h3>
+    <div class="help-text">
+        <strong>Quick Decision View:</strong> Critical metrics, engagement health status, and action priorities at a glance.
     </div>
     """, unsafe_allow_html=True)
     
-    # Extract key points from summary
-    col_left, col_right = st.columns([2, 1])
+    # Visual health indicator
+    avg_sentiment_pct = avg_sentiment * 100
+    if avg_sentiment >= 0.55:
+        health_status = "HEALTHY"
+        health_color = "#00875A"
+        health_bg = "#E3FCEF"
+        health_icon = "✓"
+    elif avg_sentiment >= 0.35:
+        health_status = "WARNING"
+        health_color = "#FF991F"
+        health_bg = "#FFF4E5"
+        health_icon = "⚠"
+    else:
+        health_status = "AT RISK"
+        health_color = "#DE350B"
+        health_bg = "#FFEBE6"
+        health_icon = "!"
     
-    with col_left:
-        # Show condensed summary
-        summary_lines = summary.split('\n')
-        key_points = [line for line in summary_lines if line.strip() and (line.strip().startswith('-') or line.strip().startswith('*'))]
-        
-        if key_points:
-            st.markdown("**Key Insights:**")
-            for point in key_points[:5]:  # Show top 5 bullet points
-                st.markdown(point)
-        else:
-            # Fallback if no bullets found
-            st.markdown(summary[:300] + "..." if len(summary) > 300 else summary)
+    # Three-column snapshot
+    snap_col1, snap_col2, snap_col3 = st.columns([1, 1, 1])
     
-    with col_right:
-        st.markdown("""  
-        <div style="background: linear-gradient(135deg, #E6F2FF 0%, #FFF 100%); padding: 1.5rem; border-radius: 0.75rem; border: 2px solid #0066CC;">
-            <h4 style="margin-top: 0; color: #0066CC;">Quick Stats</h4>
-            <p style="margin: 0.5rem 0;"><strong>Most Common Topic:</strong><br/>{}</p>
-            <p style="margin: 0.5rem 0;"><strong>Sentiment Trend:</strong><br/>{}</p>
+    with snap_col1:
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, {health_bg} 0%, #FFF 100%); 
+                    padding: 1.5rem; border-radius: 0.75rem; 
+                    border: 3px solid {health_color}; min-height: 160px;
+                    display: flex; flex-direction: column; justify-content: center;">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; color: {health_color}; font-weight: bold;">{health_icon}</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: {health_color}; margin-top: 0.5rem;">
+                    {health_status}
+                </div>
+                <div style="font-size: 0.9rem; color: #6B6B6B; margin-top: 0.5rem;">
+                    Overall Engagement Health
+                </div>
+                <div style="font-size: 1.2rem; font-weight: 600; color: #1D1D1F; margin-top: 0.5rem;">
+                    {avg_sentiment_pct:.1f}% Sentiment Score
+                </div>
+            </div>
         </div>
-        """.format(
-            df_filtered['topic'].mode()[0] if len(df_filtered) > 0 else "N/A",
-            "Improving" if avg_sentiment > 0.6 else "Needs Attention" if avg_sentiment < 0.4 else "Stable"
-        ), unsafe_allow_html=True)
-
+        """, unsafe_allow_html=True)
+    
+    with snap_col2:
+        most_common_topic = df_filtered['topic'].mode()[0] if len(df_filtered) > 0 else "N/A"
+        topic_count = len(df_filtered[df_filtered['topic'] == most_common_topic])
+        topic_pct = (topic_count / len(df_filtered) * 100) if len(df_filtered) > 0 else 0
+        
+        st.markdown(f"""
+        <div style="background-color: #F5F5F7; padding: 1.5rem; border-radius: 0.75rem; 
+                    border: 2px solid #E8E8ED; min-height: 160px;">
+            <h4 style="margin-top: 0; color: #0072B2; font-size: 1.1rem;">Top Issue Requiring Attention</h4>
+            <div style="font-size: 1.3rem; font-weight: 600; color: #1D1D1F; margin: 0.75rem 0;">
+                {most_common_topic}
+            </div>
+            <div style="color: #6B6B6B; font-size: 0.95rem;">
+                {topic_count} engagements ({topic_pct:.1f}%)
+            </div>
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E8E8ED; font-size: 0.85rem; color: #4A4A4A;">
+                <strong>Action:</strong> Review detailed analytics in Topics & Issues tab
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with snap_col3:
+        positive_rate = (positive_count / len(df_filtered) * 100) if len(df_filtered) > 0 else 0
+        at_risk_rate = (at_risk_count / len(df_filtered) * 100) if len(df_filtered) > 0 else 0
+        
+        st.markdown(f"""
+        <div style="background-color: #F5F5F7; padding: 1.5rem; border-radius: 0.75rem; 
+                    border: 2px solid #E8E8ED; min-height: 160px;">
+            <h4 style="margin-top: 0; color: #0072B2; font-size: 1.1rem;">Engagement Breakdown</h4>
+            <div style="margin: 0.5rem 0;">
+                <span style="color: #00875A; font-weight: 600; font-size: 1.1rem;">{positive_count}</span>
+                <span style="color: #6B6B6B; font-size: 0.9rem;"> Positive ({positive_rate:.1f}%)</span>
+            </div>
+            <div style="margin: 0.5rem 0;">
+                <span style="color: #DE350B; font-weight: 600; font-size: 1.1rem;">{at_risk_count}</span>
+                <span style="color: #6B6B6B; font-size: 0.9rem;"> At Risk ({at_risk_rate:.1f}%)</span>
+            </div>
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E8E8ED; font-size: 0.85rem; color: #4A4A4A;">
+                <strong>Total Engagements:</strong> {len(df_filtered):,}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("")
+    st.markdown("")
+    
+    # At-Risk Engagements Overview - Simple and actionable
+    st.markdown("### Engagements Requiring Attention")
+    st.markdown("""
+    <div class="help-text">
+        <strong>What this shows:</strong> This table displays all engagements that need immediate attention, sorted by priority. 
+        Focus on engagements with low sentiment scores (below 0.35) and those that haven't been updated recently (7+ days).
+        <br><br>
+        <strong>How to use:</strong> Review the top rows first—these are your highest priorities. Click through to the detailed 
+        tabs below to investigate specific issues and develop action plans.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Calculate priority score: lower sentiment + older = higher priority
+    df_priority = df_filtered.copy()
+    df_priority['date'] = pd.to_datetime(df_priority['date'])
+    today = df_priority['date'].max()
+    df_priority['days_stale'] = (today - df_priority['date']).dt.days
+    
+    # Priority score: sentiment inverted (lower is worse) + staleness
+    # Normalize to 0-100 scale
+    df_priority['priority_score'] = (1 - df_priority['sentiment_score']) * 50 + (df_priority['days_stale'] / df_priority['days_stale'].max() * 50)
+    
+    # Filter to concerning engagements (sentiment < 0.55 OR stale > 7 days OR at-risk status)
+    df_concerning = df_priority[
+        (df_priority['sentiment_score'] < 0.55) | 
+        (df_priority['days_stale'] > 7) |
+        (df_priority['status'] == 'at-risk')
+    ].sort_values('priority_score', ascending=False).head(10)
+    
+    if len(df_concerning) > 0:
+        # Create display dataframe
+        display_df = pd.DataFrame({
+            'Customer': df_concerning['customer'],
+            'Status': df_concerning['status'].str.capitalize(),
+            'Sentiment': df_concerning['sentiment_score'].round(3),
+            'Days Since Update': df_concerning['days_stale'].astype(int),
+            'Top Issue': df_concerning['topic'],
+            'Priority Score': df_concerning['priority_score'].round(1)
+        })
+        
+        st.dataframe(
+            display_df,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Sentiment": st.column_config.ProgressColumn(
+                    "Sentiment",
+                    help="Sentiment score from 0 (very negative) to 1 (very positive)",
+                    format="%.3f",
+                    min_value=0,
+                    max_value=1,
+                ),
+                "Priority Score": st.column_config.ProgressColumn(
+                    "Priority Score",
+                    help="Combined priority based on sentiment and staleness (higher = more urgent)",
+                    format="%.1f",
+                    min_value=0,
+                    max_value=100,
+                ),
+            }
+        )
+        
+        st.caption(f"Showing top {len(df_concerning)} engagements that need attention out of {len(df_filtered)} total")
+    else:
+        st.success("All engagements are healthy—no immediate action required!")
+    
     st.markdown("---")
     st.markdown("")
 
@@ -863,15 +996,36 @@ def main():
         st.markdown("""
         <div class="help-text">
             <strong>About this view:</strong> Track customer sentiment across engagements. 
-            Sentiment scores range from 0 (very negative) to 1 (very positive), with 0.5 representing neutral feedback.
+            Sentiment scores range from 0 (very negative) to 1 (very positive). 
+            Scores above 0.55 are considered healthy, 0.35-0.55 warrant monitoring, and below 0.35 require immediate attention.
         </div>
         """, unsafe_allow_html=True)
         
-        col1, col2 = st.columns(2)
-        with col1:
-            st.plotly_chart(plot_sentiment_distribution(df_filtered), use_container_width=True)
-        with col2:
-            st.plotly_chart(plot_sentiment_over_time(df_filtered), use_container_width=True)
+        # ENHANCED: Single-row layout with improved stacked bar chart
+        st.markdown("### Sentiment Overview")
+        st.markdown("""
+        <div style="background-color: #F5F5F7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <strong>What this chart shows:</strong> The proportion of engagements with positive, neutral, and negative sentiment.
+            <br>
+            <strong>What to look for:</strong> A healthy engagement portfolio should have 60%+ positive sentiment. 
+            If negative sentiment exceeds 20%, investigate the common issues in the Topics tab below.
+        </div>
+        """, unsafe_allow_html=True)
+        st.plotly_chart(plot_sentiment_distribution(df_filtered), use_container_width=True)
+        
+        st.markdown("")
+        st.markdown("### Sentiment Trend Analysis")
+        st.markdown("""
+        <div style="background-color: #F5F5F7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <span style="font-size: 0.9rem; color: #4A4A4A;">
+                <strong>How to interpret:</strong> The chart shows a 7-day rolling average to smooth daily fluctuations. 
+                Background zones indicate health: <span style="color: #00875A; font-weight: 600;">green=healthy</span>, 
+                <span style="color: #FF991F; font-weight: 600;">yellow=warning</span>, 
+                <span style="color: #DE350B; font-weight: 600;">red=danger</span>.
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
+        st.plotly_chart(plot_sentiment_over_time(df_filtered), use_container_width=True)
         
         st.markdown("")
         st.markdown("### Recent Negative Feedback")
@@ -897,7 +1051,36 @@ def main():
         st.markdown("""
         <div class="help-text">
             <strong>About this view:</strong> Identify the most frequently discussed topics and technical challenges 
-            across customer engagements to prioritize solutions and knowledge sharing.
+            across customer engagements. Topics appearing frequently may indicate systemic issues requiring 
+            knowledge base articles, training, or product improvements.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Add topic concentration insight
+        unique_topics = len(df_filtered['topic'].unique())
+        total_engagements = len(df_filtered)
+        top_topic = df_filtered['topic'].mode()[0] if len(df_filtered) > 0 else "N/A"
+        top_topic_count = len(df_filtered[df_filtered['topic'] == top_topic])
+        concentration_pct = (top_topic_count / total_engagements * 100) if total_engagements > 0 else 0
+        
+        col_stat1, col_stat2, col_stat3 = st.columns(3)
+        with col_stat1:
+            st.metric("Unique Topics", unique_topics, help="Number of distinct technical topics identified")
+        with col_stat2:
+            st.metric("Top Topic", top_topic, help="Most frequently appearing topic")
+        with col_stat3:
+            st.metric("Concentration", f"{concentration_pct:.1f}%", 
+                     help="Percentage of engagements involving the top topic")
+        
+        st.markdown("")
+        
+        st.markdown("""
+        <div style="background-color: #F5F5F7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <strong>What this chart shows:</strong> The most frequently discussed technical topics across all customer engagements.
+            <br>
+            <strong>What to look for:</strong> If one topic dominates (>30% of engagements), it may indicate a systemic issue 
+            requiring a knowledge base article, product fix, or dedicated training. Topics with high frequency but low sentiment 
+            are especially critical.
         </div>
         """, unsafe_allow_html=True)
         
@@ -905,6 +1088,7 @@ def main():
         
         st.markdown("")
         st.markdown("### Topic Deep Dive")
+        st.caption("Explore detailed notes and engagement status for specific topics")
         
         selected_topic = st.selectbox(
             "Select a topic to view detailed notes:", 
@@ -928,7 +1112,22 @@ def main():
         st.markdown("""
         <div class="help-text">
             <strong>About this view:</strong> Compare market demand (based on engagement frequency) versus current team proficiency. 
-            Larger gaps indicate priority areas for training, hiring, or knowledge transfer.
+            <strong>How to interpret:</strong> Technologies on the right (red) show training gaps where demand exceeds team capability. 
+            Technologies on the left (green) indicate surplus capacity. Focus investment on the largest rightward bars.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div style="background-color: #F5F5F7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <strong>What this chart shows:</strong> The gap between market demand (how often we encounter each technology) 
+            and our team's current proficiency level.
+            <br>
+            <strong>How to read it:</strong> 
+            <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                <li><strong>Bars extending right (red):</strong> Training gaps—demand exceeds our capability. These are investment priorities.</li>
+                <li><strong>Bars extending left (green):</strong> Surplus capacity—our team exceeds current demand.</li>
+                <li><strong>Longest bars:</strong> Highest priority for training or hiring decisions.</li>
+            </ul>
         </div>
         """, unsafe_allow_html=True)
         
@@ -936,6 +1135,7 @@ def main():
         
         st.markdown("")
         st.markdown("### Recommended Actions")
+        st.caption("Strategic priorities based on skills gap analysis")
         
         col_action1, col_action2 = st.columns(2)
         
