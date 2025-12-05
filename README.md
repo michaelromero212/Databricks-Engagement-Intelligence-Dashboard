@@ -118,6 +118,15 @@ To move this from a local prototype to a production internal tool at Databricks:
     - Replace the JSON sample data with a direct connection to **Databricks SQL**.
     - Use the Databricks SDK to fetch real-time engagement logs from Delta Tables.
 
+## 🧱 Databricks Integration Setup
+This project supports direct integration with Databricks SQL Warehouses.
+
+### One-Time Data Setup
+1. **Import Notebook**: `notebooks/ingest_engagements.py` to your workspace.
+2. **Run Once**: Run the notebook **one time** to create the `engagements` Delta table. parameters:
+   - *Note: The data persists in Delta Lake, so you do NOT need to re-run this for every dashboard session.*
+3. **Configure Backend**: Add your SQL Warehouse HTTP Path to `.env`.
+
 3.  **Authentication**:
     - Integrate **SSO (Single Sign-On)** using Databricks OAuth or Okta to secure access.
 

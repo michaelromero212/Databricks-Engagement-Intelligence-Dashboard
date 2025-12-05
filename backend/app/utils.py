@@ -10,15 +10,15 @@ logger = logging.getLogger(__name__)
 # --- Plotting Helpers (Adapted from app/dashboard/plot_components.py) ---
 
 COLORS = {
-    'primary': '#2962FF',  # Databricks Blue
-    'secondary': '#FF991F', # Warning Orange
-    'positive': '#00875A', # Success Green
-    'negative': '#DE350B', # Danger Red
-    'neutral': '#42526E',  # Neutral Grey
+    'primary': '#FF3621',     # Databricks Red
+    'secondary': '#1B3139',   # Databricks Dark
+    'positive': '#1CB5A0',    # Teal (accessible)
+    'negative': '#FF7557',    # Databricks Orange (accessible vs red)
+    'neutral': '#64748B',     # Slate
     'background': '#FFFFFF',
     'text': '#172B4D',
-    'gap_positive': '#00875A',
-    'gap_negative': '#DE350B'
+    'gap_positive': '#1CB5A0',
+    'gap_negative': '#FF7557'
 }
 
 COMMON_LAYOUT = dict(
