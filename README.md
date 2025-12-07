@@ -10,7 +10,8 @@ The **Databricks PS Intelligence Dashboard** is designed to help Field Engineeri
 
 ### Key Features
 - **Real-time KPI Tracking**: Monitor Total Engagements, Average Sentiment, At-Risk Accounts, and Topic Trends.
-- **Interactive Visualizations**: Drill down into data with dynamic charts (Bar, Line, Scatter, Treemap).
+- **Interactive Visualizations**: Dynamic charts including trend lines, account health tables, and topic analytics.
+- **Databricks SQL Integration**: Query data directly from Delta Tables via SQL Warehouse.
 - **Advanced Filtering**: Client-side filtering by Search, Status (At-Risk, Completed), and Sentiment.
 - **Responsive Design**: Fully functional on desktop, tablet, and mobile devices.
 - **Accessibility**: Color-blind friendly palette (Teal/Orange) and clear chart explanations.
@@ -37,24 +38,24 @@ A detailed, sortable data grid for deep dives into specific customer interaction
 
 ### 3. Sentiment Analysis
 Advanced analytics to track customer health over time.
-- **Sentiment Trend**: A spline-interpolated line chart showing the rolling average sentiment.
-- **Health Matrix**: A scatter plot (Sentiment vs. Date) to spot outliers and recent trends.
+- **Sentiment Trend**: Linear-interpolated line chart with data markers showing rolling average sentiment.
+- **Customer Account Health Table**: Aggregated view per customer showing engagement count, avg sentiment, trend direction (↑/→/↓), and status badges.
 
 ![Sentiment Analysis](docs/images/dashboard_sentiment.png)
-*Figure 3: The Sentiment tab featuring trend lines and a health matrix scatter plot.*
+*Figure 3: The Sentiment tab featuring trend lines and Customer Account Health table.*
 
-### 4. Topic Landscape
-A hierarchical view of what's top-of-mind for customers.
-- **Treemap**: Visualizes topic frequency, with larger blocks representing more common topics.
+### 4. Topic Trends
+Track how discussion topics evolve over time.
+- **Topic Trend Lines**: Multi-line chart showing topic frequency by month. Rising lines indicate growing focus areas.
 
-![Topic Landscape](docs/images/dashboard_topics.png)
-*Figure 4: The Topics tab displaying a Treemap of technical discussions.*
+![Topic Trends](docs/images/dashboard_topics.png)
+*Figure 4: The Topics tab displaying trend lines for technical discussions.*
 
-### 5. Mobile Experience
-The dashboard is fully responsive, ensuring Field Engineers can access insights on the go.
+### 5. Executive Briefing
+AI-generated weekly summary with wins and risks.
 
-![Mobile View](docs/images/dashboard_mobile.png)
-*Figure 5: The dashboard adapts seamlessly to mobile screens with a collapsible sidebar.*
+![Executive Briefing](docs/images/dashboard_briefing.png)
+*Figure 5: The Briefing tab with AI-generated executive summary.*
 
 ---
 
@@ -118,17 +119,37 @@ To move this from a local prototype to a production internal tool at Databricks:
     - Replace the JSON sample data with a direct connection to **Databricks SQL**.
     - Use the Databricks SDK to fetch real-time engagement logs from Delta Tables.
 
-## 🧱 Databricks Integration Setup
-This project supports direct integration with Databricks SQL Warehouses.
+## 🧱 Databricks Integration
 
-### One-Time Data Setup
-1. **Import Notebook**: `notebooks/ingest_engagements.py` to your workspace.
-2. **Run Once**: Run the notebook **one time** to create the `engagements` Delta table. parameters:
-   - *Note: The data persists in Delta Lake, so you do NOT need to re-run this for every dashboard session.*
-3. **Configure Backend**: Add your SQL Warehouse HTTP Path to `.env`.
+This project supports **direct integration with Databricks SQL Warehouses** for real-time data access.
 
-3.  **Authentication**:
-    - Integrate **SSO (Single Sign-On)** using Databricks OAuth or Okta to secure access.
+### Features
+- **SQL Warehouse Connectivity**: Query Delta Tables directly via `databricks-sql-connector`
+- **Embedded Sample Data**: Ingestion notebook includes sample data for quick demos
+- **Automatic Fallback**: Uses local JSON when Databricks credentials unavailable
 
-4.  **CI/CD**:
-    - Set up GitHub Actions pipelines to run tests (`pytest`) and build/push Docker images on every commit.
+### One-Time Setup
+1. **Generate Token**: In Databricks, go to User Settings → Developer → Access Tokens
+2. **Create `.env`**: Add credentials to `backend/.env`:
+   ```bash
+   DATABRICKS_HOST=https://your-workspace.cloud.databricks.com
+   DATABRICKS_TOKEN=dapi...
+   DATABRICKS_HTTP_PATH=/sql/1.0/warehouses/your-warehouse-id
+   ```
+3. **Run Ingestion Notebook**: Import and run `notebooks/ingest_engagements.py` **once** to create the `engagements` table
+4. **Start Dashboard**: Data persists in Delta Lake - no need to re-run the notebook!
+
+### CLI Setup (Optional)
+```bash
+./scripts/setup_databricks.sh  # Uploads notebook and sample data
+```
+
+---
+
+## 🔮 Future Deployment Strategy
+
+To move this from a local prototype to a production internal tool at Databricks:
+
+1. **Containerization**: Build Docker images and deploy with Kubernetes or Databricks Apps
+2. **Authentication**: Integrate SSO using Databricks OAuth or Okta
+3. **CI/CD**: Set up GitHub Actions for automated testing and deployment
